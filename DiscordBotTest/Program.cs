@@ -51,6 +51,14 @@ namespace DiscordBotTest
                 }
                 
             }
+            if (message.Content.Contains("!slap"))
+            {
+                var users = message.MentionedUsers;
+                foreach (var u in users)
+                {
+                    await message.Channel.SendMessageAsync($"Sinampal ni {message.Author.Username} si {u.Mention} sa mukha ");
+                }
+            }
         }
     }
 }
