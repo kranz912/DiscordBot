@@ -14,9 +14,10 @@ namespace DiscordBotTest
             _client.Log += LogAsync;
             _client.Ready += ReadyAsync;
             _client.MessageReceived += MessageReceivedAsync;
+            _client.UserJoined += AnnounceJoinedUser;
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("discordtoken"));
             await _client.StartAsync();
-
+            
             await Task.Delay(-1);
 
         }
@@ -59,6 +60,11 @@ namespace DiscordBotTest
                     await message.Channel.SendMessageAsync($"Sinampal ni {message.Author.Username} si {u.Mention} sa mukha ");
                 }
             }
+        }
+        public async Task AnnounceJoinedUser (SocketGuildUser user)
+        {
+            var channel = _client.GetChannel(330240114921963520) as SocketTextChannel;
+            await channel.SendMessageAsync($"Welcome sa bikini gaming {user.Mention}. Maligo ka everyday!");
         }
     }
 }
