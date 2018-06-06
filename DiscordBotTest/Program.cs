@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using System;
 using System.Threading.Tasks;
+using DiscordBotTest.MemeGenerator;
 namespace DiscordBotTest
 {
     class Program
@@ -15,6 +16,7 @@ namespace DiscordBotTest
             _client.Ready += ReadyAsync;
             _client.MessageReceived += MessageReceivedAsync;
             _client.UserJoined += AnnounceJoinedUser;
+            _client.UserLeft += AnnounceUserLeft;
             await _client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("discordtoken"));
             await _client.StartAsync();
             
@@ -29,6 +31,7 @@ namespace DiscordBotTest
         public Task ReadyAsync()
         {
             Console.WriteLine($"{_client.CurrentUser} is connected");
+           
             return Task.CompletedTask;
         }
         private async Task MessageReceivedAsync(SocketMessage message)
@@ -60,11 +63,28 @@ namespace DiscordBotTest
                     await message.Channel.SendMessageAsync($"Sinampal ni {message.Author.Username} si {u.Mention} sa mukha ");
                 }
             }
+            if(message.Content == "!meme")
+            {
+                var res = Generator.GetFromApiAsync("https://api.imgflip.com/get_memes");
+                Console.WriteLine(res.Result.data.memes[0].url);
+                Random random = new Random();
+                int r = random.Next(0, 100);
+                await Generator.downloadfile(res.Result.data.memes[r].url);
+                await message.Channel.SendFileAsync("temp.jpg",res.Result.data.memes[r].name);
+
+            }
         }
         public async Task AnnounceJoinedUser (SocketGuildUser user)
         {
             var channel = _client.GetChannel(330240114921963520) as SocketTextChannel;
             await channel.SendMessageAsync($"Welcome sa bikini gaming {user.Mention}. Maligo ka everyday!");
         }
+        public async Task AnnounceUserLeft(SocketGuildUser user)
+        {
+            var channel = _client.GetChannel(330240114921963520) as SocketTextChannel;
+            await channel.SendMessageAsync($"Bye bye {user.Mention}. Balik ka ha! Maligo ka everyday!");
+
+        }
+       
     }
 }
